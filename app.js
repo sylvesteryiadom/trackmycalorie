@@ -11,21 +11,22 @@ const itemCtrl = (function () {
 
     // Data Structure/ State
     const data = {
-        items: [{
-                id: 0,
-                name: "Steak Dinner",
-                calories: 1200
-            },
-            {
-                id: 1,
-                name: "Cookie",
-                calories: 100
-            },
-            {
-                id: 2,
-                name: "Eggs",
-                calories: 400
-            }
+        items: [
+            // {
+            //     id: 0,
+            //     name: "Steak Dinner",
+            //     calories: 1200
+            // },
+            // {
+            //     id: 1,
+            //     name: "Cookie",
+            //     calories: 100
+            // },
+            // {
+            //     id: 2,
+            //     name: "Eggs",
+            //     calories: 400
+            // }
         ],
 
         currentItem: null,
@@ -50,10 +51,21 @@ const itemCtrl = (function () {
             // Create new Item from the constructor;
             const newItem = new Item(ID, name, calories);
             data.items.push(newItem);
-            console.log(data);
-            console.log(newItem);
+
             // return the new item so it can be used in the UI controller
             return newItem;
+        },
+        getTotalCalories: function () {
+            let total = 0;
+            // loop through items and get total calories
+            data.items.forEach((item) => {
+                total += item.calories;
+            });
+
+            // Set total cal in data structure
+            data.totalCalories = total;
+            // return total calories
+            return data.totalCalories;
         },
     }
 })();
@@ -66,6 +78,7 @@ const UICtrl = (function () {
         addBtn: document.querySelector('.add-btn'),
         itemName: document.querySelector('#item-name'),
         itemCalorie: document.querySelector('#item-calories'),
+        totalCalories: document.querySelector('.total-calories'),
     }
 
     // Public Methods
@@ -88,6 +101,33 @@ const UICtrl = (function () {
                 name: uiSelectors.itemName.value,
                 calories: uiSelectors.itemCalorie.value,
             }
+        },
+        addListItem: function (item) {
+            // list collection
+            uiSelectors.collection.style.display = 'block';
+            // create li
+            const li = document.createElement('li');
+            // add class
+            li.className = `collection-item`;
+            // add ID;
+            li.id = `item-${item.ID}`;
+            // add inner HTML
+            li.innerHTML = `<strong>${item.name} :</strong> <em>${item.calories} Calories</em>
+                        <a href="" class="secondary-content">
+                            <i class="edit-item fa fa-pencil"></i>
+                        </a>`;
+
+            uiSelectors.collection.insertAdjacentElement('beforeend', li);
+        },
+        clearFields: function () {
+            uiSelectors.itemName.value = '';
+            uiSelectors.itemCalorie.value = '';
+        },
+        hideList: function () {
+            uiSelectors.collection.style.display = 'none';
+        },
+        showTotalCalories: function (totalCalories) {
+            uiSelectors.totalCalories.textContent = totalCalories;
         },
         // exposing the ui selectors to the app controller
         getDomSelectors: function () {
@@ -116,6 +156,18 @@ const App = (function (itemCtrl, UICtrl) {
             // add item to the data structure;
             const newItem = itemCtrl.addItem(itemInput.name, itemInput.calories);
 
+            // Add item to UI List
+            UICtrl.addListItem(newItem);
+
+            // Get total calories
+            const totalCalories = itemCtrl.getTotalCalories();
+
+            // display total calories
+            UICtrl.showTotalCalories(totalCalories);
+
+            //clear fields;
+            UICtrl.clearFields();
+
         } else {
             alert(`Please input meals and calories`);
         };
@@ -129,10 +181,16 @@ const App = (function (itemCtrl, UICtrl) {
             console.log('App is working...');
             // Fetch items from items data structure
             const items = itemCtrl.getItems();
-
-            // Populate UI with items
-            UICtrl.populateItemList(items);
-
+            if (items.length === 0) {
+                UICtrl.hideList();
+            } else {
+                // Populate UI with items
+                UICtrl.populateItemList(items);
+            }
+            // Get total calories
+            const totalCalories = itemCtrl.getTotalCalories();
+            // display total calories
+            UICtrl.showTotalCalories(totalCalories);
             // event listeners
             loadEventListeners();
         }
