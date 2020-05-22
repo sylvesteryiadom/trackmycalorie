@@ -49,8 +49,9 @@ const itemCtrl = (function () {
             calories = parseInt(calories);
             // Create new Item from the constructor;
             const newItem = new Item(ID, name, calories);
-
-            data.push(newItem);
+            data.items.push(newItem);
+            console.log(data);
+            console.log(newItem);
             // return the new item so it can be used in the UI controller
             return newItem;
         },
@@ -114,6 +115,7 @@ const App = (function (itemCtrl, UICtrl) {
         if (itemInput.name !== '' && itemInput.calories !== '') {
             // add item to the data structure;
             const newItem = itemCtrl.addItem(itemInput.name, itemInput.calories);
+
         } else {
             alert(`Please input meals and calories`);
         };
