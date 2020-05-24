@@ -73,6 +73,20 @@ const itemCtrl = (function () {
                 calories: data.currentItem.calories
             }
         },
+        updateItem: function (name, calories) {
+            // turn calories to number
+            calories = parseInt(calories);
+
+            let found = null;
+            data.items.forEach(item => {
+                if (item.id === data.currentItem.id) {
+                    item.name = name;
+                    item.calories = calories;
+                    found = item;
+                }
+            });
+            return found;
+        },
         getTotalCalories: function () {
             let total = 0;
             // loop through items and get total calories
@@ -102,6 +116,7 @@ const UICtrl = (function () {
         deleteBtn: document.querySelector('.delete-btn'),
         collection: document.querySelector('.collection'),
         itemCalorie: document.querySelector('#item-calories'),
+        listItems: '#item-list li',
         totalCalories: document.querySelector('.total-calories'),
     }
 
@@ -143,6 +158,26 @@ const UICtrl = (function () {
 
             uiSelectors.collection.insertAdjacentElement('beforeend', li);
         },
+        updateListItem: function (item) {
+            let listItems = document.querySelectorAll(uiSelectors.listItems);
+            //convert nodelist to array
+            listItems = Array.from(listItems);
+
+            // check for itemID and update it with incoming item name and calories;
+            listItems.forEach(listItem => {
+                const itemID = listItem.getAttribute('id');
+                console.log(itemID);
+                if (itemID === `item-${item.id}`) {
+                    document.querySelector(`#${itemID}`).innerHTML = `<strong>${item.name} :</strong> <em>${item.calories} Calories</em>
+                    <a href="" class="secondary-content">
+                        <i class="edit-item fa fa-pencil"></i>
+                    </a>`;
+                };
+
+            });
+
+        },
+
         clearFields: function () {
             uiSelectors.itemName.value = '';
             uiSelectors.itemCalorie.value = '';
@@ -257,6 +292,19 @@ const App = (function (itemCtrl, UICtrl) {
 
         // update item
         const updatedItem = itemCtrl.updateItem(input.name, input.calories);
+
+        // Update UI;
+        UICtrl.updateListItem(updatedItem);
+
+        // Get total calories
+        const totalCalories = itemCtrl.getTotalCalories();
+
+        // display total calories
+        UICtrl.showTotalCalories(totalCalories);
+
+        //Clear edit state
+        UICtrl.clearEditState();
+
         e.preventDefault();
     }
     // Public Methods
