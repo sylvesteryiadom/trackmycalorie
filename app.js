@@ -59,7 +59,7 @@ const ItemCtrl = (function () {
         this.calories = calories;
     }
 
-    // Data Structure / State
+    // Data Structure of what a collection of items look like / State
     const data = {
         // items: [
         //     // {id: 0, name: 'Steak Dinner', calories: 1200},
