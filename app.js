@@ -55,6 +55,24 @@ const itemCtrl = (function () {
             // return the new item so it can be used in the UI controller
             return newItem;
         },
+        getItembyID: function (id) {
+            let found = null;
+            data.items.forEach(item => {
+                if (item.id === id) {
+                    found = item;
+                }
+            });
+            return found;
+        },
+        setCurrentItem: function (item) {
+            data.currentItem = item;
+        },
+        getCurrentItem: function () {
+            return {
+                name: data.currentItem.name,
+                calories: data.currentItem.calories
+            }
+        },
         getTotalCalories: function () {
             let total = 0;
             // loop through items and get total calories
@@ -67,6 +85,9 @@ const itemCtrl = (function () {
             // return total calories
             return data.totalCalories;
         },
+        logData: function () {
+            return data;
+        }
     }
 })();
 
@@ -74,9 +95,12 @@ const itemCtrl = (function () {
 const UICtrl = (function () {
     // DOM Selectors object
     const uiSelectors = {
-        collection: document.querySelector('.collection'),
         addBtn: document.querySelector('.add-btn'),
+        backBtn: document.querySelector('.back-btn'),
         itemName: document.querySelector('#item-name'),
+        updateBtn: document.querySelector('.update-btn'),
+        deleteBtn: document.querySelector('.delete-btn'),
+        collection: document.querySelector('.collection'),
         itemCalorie: document.querySelector('#item-calories'),
         totalCalories: document.querySelector('.total-calories'),
     }
@@ -110,7 +134,7 @@ const UICtrl = (function () {
             // add class
             li.className = `collection-item`;
             // add ID;
-            li.id = `item-${item.ID}`;
+            li.id = `item-${item.id}`;
             // add inner HTML
             li.innerHTML = `<strong>${item.name} :</strong> <em>${item.calories} Calories</em>
                         <a href="" class="secondary-content">
@@ -129,6 +153,24 @@ const UICtrl = (function () {
         showTotalCalories: function (totalCalories) {
             uiSelectors.totalCalories.textContent = totalCalories;
         },
+        clearEditState: function () {
+            UICtrl.clearFields();
+            uiSelectors.updateBtn.style.display = 'none';
+            uiSelectors.deleteBtn.style.display = 'none';
+            uiSelectors.backBtn.style.display = 'none';
+            uiSelectors.addBtn.style.display = 'inline';
+        },
+        showEditState: function () {
+            uiSelectors.updateBtn.style.display = 'inline';
+            uiSelectors.deleteBtn.style.display = 'inline';
+            uiSelectors.backBtn.style.display = 'inline';
+            uiSelectors.addBtn.style.display = 'none';
+        },
+        addItemtoForm: function () {
+            uiSelectors.itemName.value = itemCtrl.getCurrentItem().name;
+            uiSelectors.itemCalorie.value = itemCtrl.getCurrentItem().calories;
+            UICtrl.showEditState();
+        },
         // exposing the ui selectors to the app controller
         getDomSelectors: function () {
             return uiSelectors;
@@ -145,6 +187,12 @@ const App = (function (itemCtrl, UICtrl) {
 
         // add item event **CLICK**
         UISelectors.addBtn.addEventListener('click', itemAddSubmit);
+
+        // Edit Icon click event
+        UISelectors.collection.addEventListener('click', itemEditClick);
+
+        //Item Update Submit
+        UISelectors.updateBtn.addEventListener('click', itemUpdateSubmit);
     }
 
     const itemAddSubmit = function (e) {
@@ -175,10 +223,39 @@ const App = (function (itemCtrl, UICtrl) {
         e.preventDefault();
     }
 
+    // Item edit click event
+    const itemEditClick = function (e) {
+        if (e.target.classList.contains('edit-item')) {
+            // Get list item id(Eg: item-0)
+            const listID = e.target.parentNode.parentNode.id;
+            const split = listID.split('-');
+            const id = parseInt(split[1]);
+
+            // get item
+            const itemtoEdit = itemCtrl.getItembyID(id);
+            // console.log(itemtoEdit);
+
+            // set current Item;
+            itemCtrl.setCurrentItem(itemtoEdit);
+
+            // add Item to form
+            UICtrl.addItemtoForm();
+
+
+        }
+        e.preventDefault();
+    }
+
+    const itemUpdateSubmit = function (e) {
+
+        e.preventDefault();
+    }
     // Public Methods
     return {
         init: function () {
             console.log('App is working...');
+            // set initial state
+            UICtrl.clearEditState();
             // Fetch items from items data structure
             const items = itemCtrl.getItems();
             if (items.length === 0) {
