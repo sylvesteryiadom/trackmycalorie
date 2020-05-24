@@ -188,6 +188,15 @@ const App = (function (itemCtrl, UICtrl) {
         // add item event **CLICK**
         UISelectors.addBtn.addEventListener('click', itemAddSubmit);
 
+        // disable submit on enter
+        document.addEventListener('keypress', function (e) {
+            if (e.keyCode === 13 || e.which === 3) {
+                e.preventDefault()
+                return false;
+            };
+        })
+
+
         // Edit Icon click event
         UISelectors.collection.addEventListener('click', itemEditClick);
 
@@ -230,24 +239,24 @@ const App = (function (itemCtrl, UICtrl) {
             const listID = e.target.parentNode.parentNode.id;
             const split = listID.split('-');
             const id = parseInt(split[1]);
-
             // get item
             const itemtoEdit = itemCtrl.getItembyID(id);
-            // console.log(itemtoEdit);
 
             // set current Item;
             itemCtrl.setCurrentItem(itemtoEdit);
 
             // add Item to form
             UICtrl.addItemtoForm();
-
-
         }
         e.preventDefault();
     }
 
     const itemUpdateSubmit = function (e) {
+        // Get item input
+        const input = UICtrl.getInputValues();
 
+        // update item
+        const updatedItem = itemCtrl.updateItem(input.name, input.calories);
         e.preventDefault();
     }
     // Public Methods
