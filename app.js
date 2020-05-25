@@ -206,18 +206,25 @@ const UICtrl = (function () {
             // Show the list
             document.querySelector(UISelectors.itemList).style.display = 'block';
             // Create li element
-            const li = document.createElement('li');
-            // Add class
-            li.className = 'collection-item';
-            // Add ID
-            li.id = `item-${item.id}`;
-            // Add HTML
-            li.innerHTML = `<strong>${item.name}: </strong> <em>${item.calories} Calories</em>
-        <a href="#" class="secondary-content">
-          <i class="edit-item fa fa-pencil"></i>
-        </a>`;
+            //     const li = document.createElement('li');
+            //     // Add class
+            //     li.className = 'collection-item';
+            //     // Add ID
+            //     li.id = `item-${item.id}`;
+            //     // Add HTML
+            //     li.innerHTML = `<strong>${item.name}: </strong> <em>${item.calories} Calories</em>
+            // <a href="#" class="secondary-content">
+            //   <i class="edit-item fa fa-pencil"></i>
+            // </a>`;
+            const li = `<li class="collection-item" id="item-${item.id}">
+                            <strong>${item.name}: </strong> <em>${item.calories} Calories</em>
+                            <a href="#" class="secondary-content">
+                            <i class="edit-item fa fa-pencil"></i>
+                            </a>
+                        </li>`;
+
             // Insert item
-            document.querySelector(UISelectors.itemList).insertAdjacentElement('beforeend', li)
+            document.querySelector(UISelectors.itemList).insertAdjacentHTML('beforeend', li)
         },
         updateListItem: function (item) {
             let listItems = document.querySelectorAll(UISelectors.listItems);
@@ -330,6 +337,7 @@ const App = (function (ItemCtrl, UICtrl, StorageCtrl) {
         document.querySelector(UISelectors.clearBtn).addEventListener('click', clearAllItemsClick);
     }
 
+    // SEPERATE FUNCTIONS CALLED BY THE LOAD EVEN LISTENER
     // Add item submit
     const itemAddSubmit = function (e) {
         // Get form input from UI Controller
